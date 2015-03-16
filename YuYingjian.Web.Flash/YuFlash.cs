@@ -5,17 +5,17 @@ using System.Web;
 
 namespace YuYingjian.Web.Flash
 {
+    /// <summary>
+    /// 使用方法：
+    /// 在逻辑代码中
+    /// YuFlash.Flash("success", "操作成功");
+    /// 在页面代码中
+    /// @if(YuFlash.HasFlash("success")){
+    ///     <p class="success">@YuFlash.Flash("success")</p>
+    /// }
+    /// </summary>
     public static class YuFlash
     {
-        /// <summary>
-        /// 使用方法：
-        /// 在逻辑代码中
-        /// YuFlash.Flash("success", "操作成功");
-        /// 在页面代码中
-        /// @if(YuFlash.HasFlash("success")){
-        ///     <p class="success">@YuFlash.Flash("success")</p>
-        /// }
-        /// </summary>
         public static void Flash(string key, string message)
         {
             HttpCookie cookie = new HttpCookie(string.Format("yyj_flash_{0}", key));
@@ -26,11 +26,15 @@ namespace YuYingjian.Web.Flash
 
         public static string Flash(string key)
         {
-            var cookie = HttpContext.Current.Request.Cookies[string.Format("yyj_flash_{0}", key)];
-            var message = HttpUtility.UrlDecode(cookie.Value, Encoding.UTF8);
-            cookie.Expires = DateTime.Now.AddHours(-6);
-            HttpContext.Current.Response.Cookies.Add(cookie);
-            return message;
+            if (HasFlash(key))
+            {
+                var cookie = HttpContext.Current.Request.Cookies[string.Format("yyj_flash_{0}", key)];
+                var message = HttpUtility.UrlDecode(cookie.Value, Encoding.UTF8);
+                cookie.Expires = DateTime.Now.AddHours(-6);
+                HttpContext.Current.Response.Cookies.Add(cookie);
+                return message;
+            }
+            return string.Empty;
         }
 
         public static bool HasFlash(string key)
